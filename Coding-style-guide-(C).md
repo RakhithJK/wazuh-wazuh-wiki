@@ -20,10 +20,10 @@ char * string;
 size_t string_len = strlen(string);
 
 char array[50];
-const char * primes[] = { 2, 3, 5, 7 };
+const int PRIMES[] = { 2, 3, 5, 7 };
 custom_type myvar = { .first_member = 0 };
 
-const char * error_messages[] {
+const char * ERROR_MESSAGES[] {
     [0]      = "No error",
     [EPERM]  = "Operation not permitted",
     [ENOENT] = "No such file or directory"
