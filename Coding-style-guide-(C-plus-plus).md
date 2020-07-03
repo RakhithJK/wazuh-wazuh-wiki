@@ -1,11 +1,11 @@
 ## Table of Contents 
-- [General principles](#general_principles)
-- [Naming conventions](#naming_conventions)
-- [Style conventions](#style_conventions)
-- [Const and exception correctness](#const_and_exception_correctness)
-- [Memory management](#memory_management)
-- [Containers use](#containers_use)
-- [Exceptions and errors](#exceptions_and_errors)
+- [General principles](#general-principles)
+- [Naming conventions](#naming-conventions)
+- [Style conventions](#style-conventions)
+- [Const and exception correctness](#const-and-exception-correctness)
+- [Memory management](#memory-management)
+- [Containers use](#containers-use)
+- [Exceptions and errors](#exceptions-and-errors)
 - [Performance](#performance)
 
 ## General principles
