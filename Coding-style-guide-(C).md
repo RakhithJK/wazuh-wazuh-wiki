@@ -1,10 +1,10 @@
 ## Table of Contents  
 
-- [Types and variables](#types_and_variables)
-- [Control flow sentences](#control_flow_sentences)
+- [Types and variables](#types-and-variables)
+- [Control flow sentences](#control-flow-sentences)
 - [Functions](#functions)
 - [Formulas](#formulas)
-- [Preprocessor definitions](#preprocessor_definitions)
+- [Preprocessor definitions](#preprocessor-definitions)
 
 ## Types and variables
 
