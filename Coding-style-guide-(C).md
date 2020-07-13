@@ -60,10 +60,14 @@ typedef enum { BLACK, WHITE } my_enum;
 ### Conditionals
 
 ```c
-if (condition) {
+if (ptr == NULL) {
     // Then-part
 } else {
     // Else-part
+}
+
+if (!is_null) {
+    // Then-part
 }
 ```
 
@@ -114,6 +118,7 @@ default:
 - `if`, `for`, `while` and `switch` are control flow sentences, no functions. 
 - Put a white-space between the reserved word and the parenthesis, and between the parenthesis and the brace.
 - The opening brace should be in the same line as the statement.
+- Use the negation operator (`!`) with boolean types only.
 - Do not indent the `case` statements inside a `switch`.
 - Comment `Fallthrough` if you explicitly want the code falls-through, this will avoid compiler warnings.
 
