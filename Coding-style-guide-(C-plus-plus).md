@@ -27,6 +27,7 @@
 * Use lower-case p prefix to indicate a pointer, e.g. `pMyObject`.
 * Use lower-case sp prefix to indicate a smart pointer, e.g. `spYourObject`.
 * Use `m_` for instance member variables, e.g. `m_isConnected`.
+  * Exception: For POD (Plain Old Data) objects it is allowed to use member variables without `m_`. This represents objects (structs) with constant values like data holders.
 * Use `ms_` for static member variables, e.g. `ms_managerInstance`.
 
 ### Class methods
