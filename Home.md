@@ -2,6 +2,5 @@ Welcome to the wazuh wiki!
 
 ## Table of contents
 
-- [[Coding style guide (C)]]
-- [[Coding style guide (C plus plus)]]
+- [[Coding Style Guides]]
 - [[Glossary]]
