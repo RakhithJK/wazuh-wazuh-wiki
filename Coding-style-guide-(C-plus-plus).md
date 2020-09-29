@@ -1,5 +1,4 @@
 ## Table of Contents 
-- [General principles](#general-principles)
 - [Naming conventions](#naming-conventions)
 - [Style conventions](#style-conventions)
 - [Const and exception correctness](#const-and-exception-correctness)
@@ -7,10 +6,6 @@
 - [Containers use](#containers-use)
 - [Exceptions and errors](#exceptions-and-errors)
 - [Performance](#performance)
-
-## General principles
-* Clean code with clarity and consistency makes things easier to follow, understand and maintain.
-* Robustness and performance firstly.
 
 ## Naming conventions
 ### Variables enum and classes
