@@ -132,6 +132,7 @@ Example:
 | -------------    | ------------- |
 | strcpy           | strncpy       |
 | strcat           | strncat       |
+| strcmp           | strncmp       |
 | printf / sprintf | snprintf      |
 | gets             | fgets         |
 | tmpfile / mktemp | mkstemp       |
