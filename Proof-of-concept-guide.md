@@ -41,6 +41,8 @@ The following document explains how to set up the Wazuh demo environment to show
 - Wazuh agent (RHEL 7)
 - Wazuh agent (Windows)
 
+A good guide on how to install these components can be found at [our installation guide](https://documentation.wazuh.com/4.0/installation-guide/index.html).
+
 The sections below explain the required configurations to set up different use cases.
 
 
