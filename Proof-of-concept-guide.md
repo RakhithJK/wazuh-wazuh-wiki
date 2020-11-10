@@ -1050,6 +1050,11 @@ ls -lah eicar.com
 
 - `*eicar.com*`
 
+#### Affected endpoints
+
+- Linux RHEL
+
+
 ## <a name="vulnerability_detector"></a>Vulnerability detection
 
 Wazuh can detect if installed applications do have an unpatched CVE in the monitored system. Check [Vulnerability Detection](https://documentation.wazuh.com/4.0/user-manual/capabilities/vulnerability-detection/index.html) documentation for further information about this.
@@ -1141,6 +1146,11 @@ Scans will be performed periodically, going through the list of applications col
 
 - `rule.groups:vulnerability-detector`
 
+#### Affected endpoints
+
+- Linux RHEL
+- Windows
+
 
 ## <a name="yara"></a>Malware detection - Yara integration
 
@@ -1148,9 +1158,9 @@ Yara is a tool aimed at (but not limited to) helping malware researchers to iden
 
 #### Configuration on the Wazuh manager
 
-Create local rules and decoders that will trigger on added/modified files in the `tmp` directory, and also the rules that will check the results.
+Create local rules and decoders that will trigger on added/modified files in the `/tmp` directory, and also the rules that will check the results.
 
-Rules at  `/var/ossec/etc/rules/local_rules.xml`:
+- Rules at  `/var/ossec/etc/rules/local_rules.xml`:
 
 ```xml
 <group name="syscheck,">
@@ -1179,7 +1189,7 @@ Rules at  `/var/ossec/etc/rules/local_rules.xml`:
 </group>
 ```
 
-Decoders at  `/var/ossec/etc/decoders/local_decoders.xml`:
+- Decoders at  `/var/ossec/etc/decoders/local_decoders.xml`:
 
 ```xml
 <decoder name="yara_decoder">
@@ -1193,17 +1203,42 @@ Decoders at  `/var/ossec/etc/decoders/local_decoders.xml`:
 </decoder>
 ```
 
+- Add this configuration to the Wazuh manager at `/var/ossec/etc/ossec.conf`the :
+
+```xml
+<ossec_config>
+    <command>
+        <name>yara</name>
+        <executable>yara.sh</executable>
+        <extra_args>-yara_path /usr/local/bin -yara_rules /tmp/yara_rules.yar</extra_args>
+        <expect>filename</expect>
+        <timeout_allowed>no</timeout_allowed>
+    </command>
+    <active-response>
+        <command>yara</command>
+        <location>local</location>
+        <rules_id>100300,100301</rules_id>
+        <timeout>600</timeout>
+    </active-response>
+</ossec_config>
+```
+
+- Restart Wazuh manager to apply configuration changes
+
+```
+systemctl restart wazuh-manager
+```
+
 #### Configuration on the monitored Linux system
 
 - Compile and install yara
 
 ```
-yum install autoconf, libtool, openssl-devel && \
-curl -O https://github.com/VirusTotal/yara/archive/v4.0.1.tar.gz && \
-tar -xvf yara-v4.0.1.tar.gz && \
-cd yara-4.0.1.tar.gz &&
-./bootstrap && ./configure && make && sudo make install && make check
-
+yum -y install make gcc autoconf libtool openssl-devel && \
+curl -LO https://github.com/VirusTotal/yara/archive/v4.0.2.tar.gz && \
+tar -xvzf v4.0.2.tar.gz && \
+cd yara-4.0.2 &&
+./bootstrap.sh && ./configure && make && sudo make install && make check
 ```
 
 - Download yara rules
@@ -1220,10 +1255,12 @@ curl 'https://valhalla.nextron-systems.com/api/v1/get' \
 --data 'demo=demo&apikey=1111111111111111111111111111111111111111111111111111111111111111&format=text' \
 -o yara_rules.yar
 ```
-- Run a scan with
+
+- Download  a malware sample (this is a real malware artifact) and run a Yara scan
 
 ```
-/usr/local/bin/yara <path_to_rules> <file_to_scan>
+curl -LO https://wazuh-demo.s3-us-west-1.amazonaws.com/mirai -o /tmp/mirai
+/usr/local/bin/yara /tmp/yara_rules.yar /tmp/mirai
 ```
 
 - Create a `yara.sh` script in `/var/ossec/active-response/bin/`. Ensure owner and group must be `root:ossec` and permissions `0750`:
@@ -1237,7 +1274,6 @@ curl 'https://valhalla.nextron-systems.com/api/v1/get' \
 # and/or modify it under the terms of the GNU General Public
 # License (version 2) as published by the FSF - Free Software
 # Foundation.
-
 
 #------------------------- Gather parameters -------------------------#
 
@@ -1277,7 +1313,6 @@ cd ../
 PWD=`pwd`
 LOG_FILE="${PWD}/../logs/active-responses.log"
 
-
 #----------------------- Analyze parameters -----------------------#
 
 if [[ ! $YARA_PATH ]] || [[ ! $YARA_RULES ]]
@@ -1286,12 +1321,10 @@ then
     exit
 fi
 
-
 #------------------------- Main workflow --------------------------#
 
 # Execute Yara scan on the specified filename
 yara_output="$("${YARA_PATH}"/yara -w -r "$YARA_RULES" "$FILENAME")"
-
 
 if [[ $yara_output != "" ]]
 then
@@ -1302,33 +1335,104 @@ then
 fi
 
 exit 1;
-
 ```
 
-- Add this block to the Wazuh manager:
+- Change `/var/ossec/active-response/bin/yara.sh` file owner and permissions:
 
 ```
-<ossec_config>
-    <command>
-        <name>yara</name>
-        <executable>yara.sh</executable>
-        <extra_args>-yara_path /usr/local/bin -yara_rules /tmp/yara_rules.yar</extra_args>
-        <expect>filename</expect>
-        <timeout_allowed>no</timeout_allowed>
-    </command>
-    <active-response>
-        <command>yara</command>
-        <location>local</location>
-        <rules_id>100300,100301</rules_id>
-        <timeout>600</timeout>
-    </active-response>
-</ossec_config>
+chmod 750 /var/ossec/active-response/bin/yara.sh
+chown root:ossec /var/ossec/active-response/bin/yara.sh
 ```
 
-#### Steps to generate alerts
+- Change the file integrity monitoring settings to monitor `/tmp`  in real time. This change can be done in `/var/ossec/etc/ossec.conf` 
 
-- Download a malware sample to `/usr/bin`
+```xml
+  <syscheck>
+    <directories whodata="yes">/tmp</directories>
+  </syscheck>
+```
 
-#### Related alerts can be found with:
+- Restart Wazuh manager to apply configuration changes
+
+```
+systemctl restart wazuh-agent
+```
+
+#### Steps to generate the alerts
+
+- Create the script `/tmp/malware_downloader.sh` to automatically download malware samples:
+
+```bash
+#!/bin/bash
+# Wazuh - Malware Downloader for demo purposes
+# Copyright (C) 2015-2020, Wazuh Inc.
+#
+# This program is free software; you can redistribute it
+# and/or modify it under the terms of the GNU General Public
+# License (version 2) as published by the FSF - Free Software
+# Foundation.
+
+function fetch_sample(){
+
+  curl -s -XGET "$1" -o "$2"
+
+}
+
+echo "WARNING: Downloading Malware samples, please use this script with  caution."
+read -p "  Do you want to continue? (y/n)" -n 1 -r ANSWER
+echo
+
+if [[ $ANSWER =~ ^[Yy]$ ]]
+then
+  echo
+  # Mirai
+  echo "# Mirai: https://en.wikipedia.org/wiki/Mirai_(malware)"
+  echo "Downloading malware sample..."
+  fetch_sample "https://wazuh-demo.s3-us-west-1.amazonaws.com/mirai" "/tmp/mirai" && echo "Done!" || echo "Error while downloading."
+  echo
+
+  # Xbash
+  echo "# Xbash: https://unit42.paloaltonetworks.com/unit42-xbash-combines-botnet-ransomware-coinmining-worm-targets-linux-windows/"
+  echo "Downloading malware sample..."
+  fetch_sample "https://wazuh-demo.s3-us-west-1.amazonaws.com/xbash" "/tmp/xbash" && echo "Done!" || echo "Error while downloading."
+  echo
+
+  # VPNFilter
+  echo "# VPNFilter: https://news.sophos.com/en-us/2018/05/24/vpnfilter-botnet-a-sophoslabs-analysis/"
+  echo "Downloading malware sample..."
+  fetch_sample "https://wazuh-demo.s3-us-west-1.amazonaws.com/vpn_filter" "/tmp/vpn_filter" && echo "Done!" || echo "Error while downloading."
+  echo
+
+  # Webshell
+  echo "# WebShell: https://github.com/SecWiki/WebShell-2/blob/master/Php/Worse%20Linux%20Shell.php"
+  echo "Downloading malware sample..."
+  fetch_sample "https://wazuh-demo.s3-us-west-1.amazonaws.com/webshell" "/tmp/webshell" && echo "Done!" || echo "Error while downloading."
+  echo
+fi
+```
+
+- Download a malware sample to `/tmp` directory by running the script:
+
+```
+bash /tmp/malware_downloader.sh
+```
+
+- On the agent, the results of the yara scan can be seen at `/var/ossec/logs/active-responses.log`
+
+```bash
+tail -f /var/ossec/logs/active-responses.log
+wazuh-yara: INFO - Scan result: SUSP_XORed_Mozilla_RID2DB4 /tmp/mirai
+wazuh-yara: INFO - Scan result: MAL_ELF_LNX_Mirai_Oct10_2_RID2F3A /tmp/mirai
+wazuh-yara: INFO - Scan result: Mirai_Botnet_Malware_RID2EF6 /tmp/mirai
+wazuh-yara: INFO - Scan result: MAL_ELF_VPNFilter_3_RID2D6C /tmp/vpn_filter
+wazuh-yara: INFO - Scan result: Webshell_Worse_Linux_Shell_php_RID3323 /tmp/webshell
+wazuh-yara: INFO - Scan result: Webshell_Worse_Linux_Shell_1_RID320C /tmp/webshell
+```
+
+#### Alerts
 
 - `rule.groups:yara`
+
+#### Affected endpoints
+
+- Linux RHEL
