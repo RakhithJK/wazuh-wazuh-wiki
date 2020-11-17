@@ -34,7 +34,7 @@
 
 ## Introduction
 
-The following document explains how to set up the Wazuh demo environment to showcase the different product capabilities.  It assumes that these components are already installed:
+The following document explains how to set up the Wazuh environment to test the different product capabilities.  It assumes that these components are already installed:
 
 - Elasticsearch + Kibana + Wazuh Kibana plugin
 - Wazuh manager + Filebeat (for integration with Elasticsearch)
@@ -56,7 +56,7 @@ RHEL also has good documentation about Audit kernel subsystem, check  [RHEL Audi
 
 - Install audit
 
-- In order to monitor your user actions, get your current EUID ('root' user monitoring is not recommended for the demo, as it can be quite noisy).
+- In order to monitor your user actions, get your current EUID ('root' user monitoring is not recommended for the test, as it can be quite noisy).
 
 ```
 echo $EUID
@@ -318,7 +318,7 @@ wget https://raw.githubusercontent.com/firehol/blocklist-ipsets/master/alienvaul
 wget https://wazuh.com/resources/iplist-to-cdblist.py -O /tmp/iplist-to-cdblist.py
 ```
 
-- Add an additional IP (the attacker) to the list. For the demo we will use the Windows endpoint.
+- Add an additional IP (the attacker) to the list. For the test, we will use the Windows endpoint.
 
 ```
 echo "${replace_by_your_windows_ip_address}" >> /var/ossec/etc/lists/alienvault_reputation.ipset
@@ -663,7 +663,7 @@ In addition, for further detection, the attack can also be detected at a network
     </localfile>
 ```
 
-- Suricata use case configured and monitoring the endpoint traffic (to make it easy, for the demo, Suricata can run in the monitored system)
+- Suricata use case configured and monitoring the endpoint traffic (to make it easy, for the test, Suricata can run in the monitored system)
 
 #### Configuration
 
@@ -703,7 +703,7 @@ This use case aims to show that Wazuh is able to detect a SQL Injection attack (
     </localfile>
 ```
 
-- Suricata use case configured and monitoring the endpoint traffic (to make it easy, for the demo, Suricata can run in the monitored system)
+- Suricata use case configured and monitoring the endpoint traffic (to make it easy, for the test, Suricata can run in the monitored system)
 
 #### Configuration
 
@@ -798,7 +798,7 @@ cp -p /usr/bin/w /usr/bin/w.copy
 ```bash
 #!/bin/bash
 echo "`date` this is evil"   > /tmp/trojan_created_file
-echo 'demo for /usr/bin/w trojaned file' >> /tmp/trojan_created_file
+echo 'test for /usr/bin/w trojaned file' >> /tmp/trojan_created_file
 #Now running original binary
 /usr/bin/w.copy
 ```
@@ -1366,7 +1366,7 @@ systemctl restart wazuh-agent
 
 ```bash
 #!/bin/bash
-# Wazuh - Malware Downloader for demo purposes
+# Wazuh - Malware Downloader for test purposes
 # Copyright (C) 2015-2020, Wazuh Inc.
 #
 # This program is free software; you can redistribute it
