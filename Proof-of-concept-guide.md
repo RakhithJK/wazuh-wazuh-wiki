@@ -711,10 +711,10 @@ This use case requires no additional configuration.
 
 #### Steps to generate the alerts
 
-- From an external host (the attacker), navigate to:
+- From an external host (the attacker), execute curl from terminal:
 
 ```
-http://${replace_by_your_web_server_address}/script.php?id=1'select * from users;
+curl -XGET "http://${replace_by_your_web_server_address}/?id=SELECT+*+FROM+users";
 ```
 
 ####  Alerts
