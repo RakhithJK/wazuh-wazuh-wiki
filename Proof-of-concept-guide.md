@@ -47,7 +47,8 @@ A good guide on how to install these components can be found at [our installatio
 
 The sections below explain the required configurations to set up different use cases.
 
-## <a name="matix"></a>Compatibility Matrix
+## <a name="matrix"></a>Compatibility Matrix
+This guide is compatible with:
 
 | Wazuh version | Elastic | ODFE   |
 |---------------|---------|--------|
