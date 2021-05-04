@@ -1,5 +1,7 @@
 ## Index
 
+- [Compatibility Matrix](#matrix)
+
 - [Auditing commands run by user](#audit)
 
 - [Amazon AWS infrastructure monitoring](#aws)
@@ -45,6 +47,11 @@ A good guide on how to install these components can be found at [our installatio
 
 The sections below explain the required configurations to set up different use cases.
 
+## <a name="matix"></a>Compatibility Matrix
+
+| Wazuh version | Elastic | ODFE   |
+|---------------|---------|--------|
+| v4.2.0        | 7.10.2  | 1.13.2 |
 
 ## <a name="audit"></a>Auditing commands run by user
 
@@ -824,7 +831,6 @@ Please, check our [VirusTotal documentation](https://documentation.wazuh.com/4.0
 - A VirusTotal API key (https://www.virustotal.com)
 - Python installed on the Wazuh manager (`yum -y install python2`)
 - Custom rules and decoders in the Wazuh manager
-- Custom integration script in the Wazuh manager
 - Custom active response script in the monitored endpoint (Linux RHEL)
 
 #### Configuring VirusTotal integration
@@ -888,79 +894,6 @@ Additionally, once VirusTotal detects a file as a threat (positive match with an
 </group>
 ```
 
-- Add the following Python script to `/var/ossec/integrations/custom-remove-threat` file.
-
-```python
-#!/usr/bin/env python
-import json
-import sys
-import time
-import os
-from socket import socket, AF_UNIX, SOCK_DGRAM
-debug_enabled = True
-pwd = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
-json_alert = {}
-now = time.strftime("%a %b %d %H:%M:%S %Z %Y")
-# Set paths
-log_file = '{0}/logs/integrations.log'.format(pwd)
-socket_addr = '{0}/queue/alerts/ar'.format(pwd)
-def main(args):
-    debug("# Starting")
-    # Read args
-    alert_file_location = args[1]
-    debug("# File location")
-    debug(alert_file_location)
-    # Load alert. Parse JSON object.
-    with open(alert_file_location) as alert_file:
-        json_alert = json.load(alert_file)
-    debug("# Processing alert")
-    debug(json_alert)
-    # Send event to AR socket
-    msg = "(msg_to_agent) [] NNS {0} remove-threat0 - {1}".format(json_alert["agent"]["id"], json_alert["data"]["virustotal"]["source"]["file"])
-    send_event(msg)
-def debug(msg):
-    if debug_enabled:
-        msg = "{0}: {1}\n".format(now, msg)
-        print(msg)
-        f = open(log_file,"a")
-        f.write(msg)
-        f.close()
-def send_event(msg):
-    sock = socket(AF_UNIX, SOCK_DGRAM)
-    sock.connect(socket_addr)
-    sock.send(msg.encode())
-    sock.close()
-if __name__ == "__main__":
-    try:
-        # Read arguments
-        bad_arguments = False
-        if len(sys.argv) >= 2:
-            alertfile=sys.argv[1]
-            msg = '{0} {1} {2} {3}'.format(now, sys.argv[1], sys.argv[2], sys.argv[3])
-        else:
-            msg = '{0} Wrong arguments'.format(now)
-            bad_arguments = True
-        # Logging the call
-        f = open(log_file, 'a')
-        f.write(msg +'\n')
-        f.close()
-        if bad_arguments:
-            debug("# Exiting: Bad arguments.")
-            sys.exit(0)
-        # Main function
-        main(sys.argv)
-    except Exception as e:
-        debug('Error:' + str(e))
-        raise
-```
-
-- Change `/var/ossec/integrations/custom-remove-threat` file owner and permissions:
-
-```
-chmod 750 /var/ossec/integrations/custom-remove-threat
-chown root:ossec /var/ossec/integrations/custom-remove-threat
-```
-
 - Append the following blocks to the Wazuh manager  `/var/ossec/etc/ossec.conf` file:
 
 ```xml
@@ -968,7 +901,6 @@ chown root:ossec /var/ossec/integrations/custom-remove-threat
     <command>
         <name>remove-threat</name>
         <executable>remove-threat.sh</executable>
-        <expect>filename</expect>
         <timeout_allowed>no</timeout_allowed>
     </command>
 
@@ -976,13 +908,10 @@ chown root:ossec /var/ossec/integrations/custom-remove-threat
         <disabled>no</disabled>
         <command>remove-threat</command>
         <location>local</location>
+        <rules_id>100200,100201</rules_id>
+        <timeout>600</timeout>
     </active-response>
 
-    <integration>
-        <name>custom-remove-threat</name>
-        <rule_id>87105</rule_id>
-        <alert_format>json</alert_format>
-    </integration>
 </ossec_config>
 ```
 
@@ -1005,21 +934,25 @@ Change the file integrity monitoring settings to monitor `/root`  in real time. 
 
 ```bash
 #!/bin/bash
-if [ "x$1" == "xdelete" ]; then
-    exit 0;
-fi
+
 LOCAL=`dirname $0`;
 cd $LOCAL
 cd ../
+
 PWD=`pwd`
 
+INPUT_JSON=$(cat -)
+FILENAME=$(echo $INPUT_JSON | jq -r .parameters.alert.syscheck.path)
+DATE=$(echo $INPUT_JSON | jq -r .parameters.alert.timestamp)
+
 # Removing file
-rm -f $3
+rm -f $FILENAME 
 if [ $? -eq 0 ]; then
-    echo "`date` $0 Removed threat located at $3" >> ${PWD}/../logs/active-responses.log
+    echo "`date` $0 Removed positive threat located in $FILENAME" >> ${PWD}/../logs/active-responses.log
 else
-    echo "`date` $0 Error removing threat located at $3" >> ${PWD}/../logs/active-responses.log
+    echo "`date` $0 Error removing positive threat located in $FILENAME" >> ${PWD}/../logs/active-responses.log
 fi
+
 exit 0;
 ```
 
@@ -1212,8 +1145,6 @@ Create local rules and decoders that will trigger on added/modified files in the
     <command>
         <name>yara</name>
         <executable>yara.sh</executable>
-        <extra_args>-yara_path /usr/local/bin -yara_rules /tmp/yara_rules.yar</extra_args>
-        <expect>filename</expect>
         <timeout_allowed>no</timeout_allowed>
     </command>
     <active-response>
@@ -1277,43 +1208,26 @@ curl -LO https://wazuh-demo.s3-us-west-1.amazonaws.com/mirai -o /tmp/mirai
 # License (version 2) as published by the FSF - Free Software
 # Foundation.
 
+
 #------------------------- Gather parameters -------------------------#
 
 # Static active response parameters
-FILENAME=$8
 LOCAL=`dirname $0`
 
 # Extra arguments
-YARA_PATH=
-YARA_RULES=
+INPUT_JSON=$(cat -)
+YARA_PATH=$(echo $INPUT_JSON | jq -r .parameters.extra_args[1])
+YARA_RULES=$(echo $INPUT_JSON | jq -r .parameters.extra_args[3])
+FILENAME=$(echo $INPUT_JSON | jq -r .parameters.alert.syscheck.path)
 
-while [[ $# -gt 0 ]]
-do
-
-case "$1" in
-    -yara_path)
-    YARA_PATH="$2"
-    shift
-    shift
-    ;;
-    -yara_rules)
-    YARA_RULES="$2"
-    shift
-    shift
-    ;;
-    *)
-    shift # past argument
-    ;;
-esac
-done
-
-# Move to the active response directory
+# Move to the active response folder
 cd $LOCAL
 cd ../
 
 # Set LOG_FILE path
 PWD=`pwd`
 LOG_FILE="${PWD}/../logs/active-responses.log"
+
 
 #----------------------- Analyze parameters -----------------------#
 
@@ -1337,6 +1251,7 @@ then
 fi
 
 exit 1;
+
 ```
 
 - Change `/var/ossec/active-response/bin/yara.sh` file owner and permissions:
