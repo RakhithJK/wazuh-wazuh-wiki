@@ -48,7 +48,7 @@ A good guide on how to install these components can be found at [our installatio
 The sections below explain the required configurations to set up different use cases.
 
 ## <a name="version"></a>Guide version
-This guide is compatible with Wazuh 4.2.0 and later. [Click here for early versions.](https://github.com/wazuh/wazuh/wiki/Proof-of-concept-guide/b3681f865eb671a0b0d13a1b1012477fd0d932ba)
+This guide is compatible with Wazuh 4.2.0 and later. [Click here for older versions.](https://github.com/wazuh/wazuh/wiki/Proof-of-concept-guide/b3681f865eb671a0b0d13a1b1012477fd0d932ba)
 
 ## <a name="audit"></a>Auditing commands run by user
 
