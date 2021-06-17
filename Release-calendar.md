@@ -1,6 +1,6 @@
 ## Upcoming versions
 
-## Minor versions
+### Minor versions
 
 |Version|First build date|Expected release date|
 |---|---|---|
