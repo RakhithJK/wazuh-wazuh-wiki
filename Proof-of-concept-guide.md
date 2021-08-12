@@ -46,13 +46,13 @@ The following document explains how to set up the Wazuh environment to test the 
 - Wazuh agent (RHEL 7)
 - Wazuh agent (Windows)
 
-A good guide on how to install these components can be found at [our installation guide](https://documentation.wazuh.com/4.0/installation-guide/index.html).
+A good guide on how to install these components can be found at [our installation guide](https://documentation.wazuh.com/current/installation-guide/index.html).
 
 The sections below explain the required configurations to set up different use cases.
 
 ## <a name="audit"></a>Auditing commands run by user
 
-On the Linux monitored endpoint (RHEL), configure Audit logging to capture execve system calls (necessary to audit commands run by users). More info on [Audit Configuration Guide](https://documentation.wazuh.com/4.0/learning-wazuh/audit-commands.html).
+On the Linux monitored endpoint (RHEL), configure Audit logging to capture execve system calls (necessary to audit commands run by users). More info on [Audit Configuration Guide](https://documentation.wazuh.com/current/learning-wazuh/audit-commands.html).
 
 RHEL also has good documentation about Audit kernel subsystem, check  [RHEL Audit documentation](https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux/6/html/security_guide/chap-system_auditing) for more information about this.
 
@@ -216,7 +216,7 @@ Check [Docker Wodle](https://documentation.wazuh.com/4.0/docker-monitor/monitori
 
 - On the monitored system (the Docker host), install required Wazuh module dependency `pip install docker`
 
-- Configure the Docker wodle in the RHEL Agent
+- Configure the Docker listener in the RHEL Agent
 
 ```xml
 <ossec_config>
@@ -371,36 +371,28 @@ chmod 660 /var/ossec/etc/lists/blacklist-alienvault
 ```xml
 <ossec_config>
     <ruleset>
-    <!-- Default ruleset -->
-    <decoder_dir>ruleset/decoders</decoder_dir>
-    <rule_dir>ruleset/rules</rule_dir>
-    <rule_exclude>0215-policy_rules.xml</rule_exclude>
-    <list>etc/lists/audit-keys</list>
-    <list>etc/lists/blacklist-alienvault</list>
-    <!-- User-defined ruleset -->
-    <decoder_dir>etc/decoders</decoder_dir>
-    <rule_dir>etc/rules</rule_dir>
+        <!-- Default ruleset -->
+        <decoder_dir>ruleset/decoders</decoder_dir>
+        <rule_dir>ruleset/rules</rule_dir>
+        <rule_exclude>0215-policy_rules.xml</rule_exclude>
+        <list>etc/lists/audit-keys</list>
+        <list>etc/lists/blacklist-alienvault</list>
+        <!-- User-defined ruleset -->
+        <decoder_dir>etc/decoders</decoder_dir>
+        <rule_dir>etc/rules</rule_dir>
     </ruleset>
 
-    <localfile>
-    <log_format>full_command</log_format>
-    <alias>process list</alias>
-    <command>ps -e -o pid,uname,command</command>
-    <frequency>30</frequency>
-    </localfile>
-
     <command>
-    <name>firewall-drop</name>
-    <executable>firewall-drop.sh</executable>
-    <expect>srcip</expect>
-    <timeout_allowed>yes</timeout_allowed>
+        <name>firewall-drop</name>
+        <executable>firewall-drop</executable>
+        <timeout_allowed>yes</timeout_allowed>
     </command>
 
     <active-response>
-    <command>firewall-drop</command>
-    <location>local</location>
-    <rules_id>100100</rules_id>
-    <timeout>60</timeout>
+        <command>firewall-drop</command>
+        <location>local</location>
+        <rules_id>100100</rules_id>
+        <timeout>60</timeout>
     </active-response>
 </ossec_config>
 ```
@@ -413,7 +405,7 @@ chmod 660 /var/ossec/etc/lists/blacklist-alienvault
 #### Steps to generate the alerts
 
 - Log in the attacker system (the Windows box) and connect to the victim (Linux RHEL) Apache server from a web browser.
-- A Linux firewall rule will temporary block any connection from the attacker system for 60 seconds (using IPtables).
+- A Linux firewall rule will temporarily block any connection from the attacker system for 60 seconds (using IPtables).
 
 #### Alerts
 
@@ -650,7 +642,7 @@ systemctl restart wazuh-agent
 
 ## <a name="shellshock"></a>Detecting a web attack - Shellshock
 
-This example shows how Wazuh can detect a Shellshock attack by analyzing web server logs collected from a monitored endpoint. Please check [Wazuh Shellshock Attack documentation](https://documentation.wazuh.com/4.0/learning-wazuh/shellshock.html)
+This example shows how Wazuh can detect a Shellshock attack by analyzing web server logs collected from a monitored endpoint. Please check [Wazuh Shellshock Attack documentation](https://documentation.wazuh.com/current/learning-wazuh/shellshock.html)
 
 In addition, for further detection, the attack can also be detected at a network level when Suricata integration is configured.
 
@@ -715,7 +707,7 @@ This use case requires no additional configuration.
 
 #### Steps to generate the alerts
 
-- From an external host (the attacker), execute curl from terminal:
+- From an external host (the attacker), execute curl from a terminal:
 
 ```
 curl -XGET "http://${replace_by_your_web_server_address}/?id=SELECT+*+FROM+users";
@@ -732,7 +724,7 @@ curl -XGET "http://${replace_by_your_web_server_address}/?id=SELECT+*+FROM+users
 
 ## <a name="slack"></a>Slack integration
 
-Wazuh can report alerts to Slack by using the [ossec-integratord](https://documentation.wazuh.com/4.0/user-manual/reference/daemons/ossec-integratord.html) daemon. Please check our [Integration with external APIs](https://documentation.wazuh.com/4.0/user-manual/manager/manual-integration.html) for detailed information about this.
+Wazuh can report alerts to Slack by using the [ossec-integratord](https://documentation.wazuh.com/current/user-manual/reference/daemons/ossec-integratord.html) daemon. Please check our [Integration with external APIs](https://documentation.wazuh.com/current/user-manual/manager/manual-integration.html) for detailed information about this.
 
 #### Configuration
 
@@ -821,7 +813,7 @@ Wait for the next rootcheck scan to be completed (frequency can be adjusted), an
 
 Wazuh has the ability to integrate with VirusTotal API, running a query when a file change is detected. For this integration we use the `ossec-integratord` component that runs on the Wazuh manager. 
 
-Please, check our [VirusTotal documentation](https://documentation.wazuh.com/4.0/user-manual/capabilities/virustotal-scan/index.html) for more information about this particular use case.
+Please, check our [VirusTotal documentation](https://documentation.wazuh.com/current/user-manual/capabilities/virustotal-scan/index.html) for more information about this particular use case.
 
 #### Prerequisites
 
@@ -905,8 +897,7 @@ Additionally, once VirusTotal detects a file as a threat (positive match with an
         <disabled>no</disabled>
         <command>remove-threat</command>
         <location>local</location>
-        <rules_id>100200,100201</rules_id>
-        <timeout>600</timeout>
+        <rules_id>87105</rules_id>
     </active-response>
 
 </ossec_config>
@@ -920,7 +911,7 @@ systemctl restart wazuh-manager
 
 #### Configuring the Wazuh agent side
 
-Change the file integrity monitoring settings to monitor `/root`  in real time. This change can be done in `/var/ossec/etc/ossec.conf` 
+Change the file integrity monitoring settings to monitor `/root`  in real-time. This change can be done in `/var/ossec/etc/ossec.conf` 
 
 ```xml
   <syscheck>
@@ -939,8 +930,7 @@ cd ../
 PWD=`pwd`
 
 INPUT_JSON=$(cat -)
-FILENAME=$(echo $INPUT_JSON | jq -r .parameters.alert.syscheck.path)
-DATE=$(echo $INPUT_JSON | jq -r .parameters.alert.timestamp)
+FILENAME=$(echo $INPUT_JSON | jq -r .parameters.alert.data.virustotal.source.file)
 
 # Removing file
 rm -f $FILENAME 
@@ -960,7 +950,7 @@ chmod 750 /var/ossec/active-response/bin/remove-threat.sh
 chown root:ossec /var/ossec/active-response/bin/remove-threat.sh
 ```
 
-- Restart Wazuh agent, on the monitored endpoint, to apply configuration changes
+- Restart the Wazuh agent, on the monitored endpoint, to apply configuration changes
 
 ```
 systemctl restart wazuh-agent
@@ -989,7 +979,7 @@ ls -lah eicar.com
 
 ## <a name="vulnerability_detector"></a>Vulnerability detection
 
-Wazuh can detect if installed applications do have an unpatched CVE in the monitored system. Check [Vulnerability Detection](https://documentation.wazuh.com/4.0/user-manual/capabilities/vulnerability-detection/index.html) documentation for further information about this.
+Wazuh can detect if installed applications do have an unpatched CVE in the monitored system. Check [Vulnerability Detection](https://documentation.wazuh.com/current/user-manual/capabilities/vulnerability-detection/index.html) documentation for further information about this.
 
 #### Configuration on the Wazuh manager
 
@@ -997,37 +987,54 @@ Wazuh can detect if installed applications do have an unpatched CVE in the monit
 
 ```xml
 <ossec_config>
-    <vulnerability-detector>
+  <vulnerability-detector>
     <enabled>yes</enabled>
     <interval>5m</interval>
     <ignore_time>6h</ignore_time>
     <run_on_start>yes</run_on_start>
+
+    <!-- Ubuntu OS vulnerabilities -->
     <provider name="canonical">
-        <enabled>yes</enabled>
-        <os>trusty</os>
-        <os>xenial</os>
-        <os>bionic</os>
-        <update_interval>1h</update_interval>
+      <enabled>yes</enabled>
+      <os>trusty</os>
+      <os>xenial</os>
+      <os>bionic</os>
+      <os>focal</os>
+      <update_interval>1h</update_interval>
     </provider>
+
+    <!-- Debian OS vulnerabilities -->
     <provider name="debian">
-        <enabled>yes</enabled>
-        <os>wheezy</os>
-        <os>stretch</os>
-        <os>jessie</os>
-        <os>buster</os>
-        <update_interval>1h</update_interval>
+      <enabled>yes</enabled>
+      <os>stretch</os>
+      <os>buster</os>
+      <update_interval>1h</update_interval>
     </provider>
+
+    <!-- RedHat OS vulnerabilities -->
     <provider name="redhat">
-        <enabled>yes</enabled>
-        <update_from_year>2010</update_from_year>
-        <update_interval>1h</update_interval>
+      <enabled>yes</enabled>
+      <os>5</os>
+      <os>6</os>
+      <os>7</os>
+      <os>8</os>
+      <update_interval>1h</update_interval>
     </provider>
+
+    <!-- Windows OS vulnerabilities -->
+    <provider name="msu">
+      <enabled>yes</enabled>
+      <update_interval>1h</update_interval>
+    </provider>
+
+    <!-- Aggregate vulnerabilities -->
     <provider name="nvd">
-        <enabled>yes</enabled>
-        <update_from_year>2010</update_from_year>
-        <update_interval>1h</update_interval>
+      <enabled>yes</enabled>
+      <update_from_year>2010</update_from_year>
+      <update_interval>1h</update_interval>
     </provider>
-    </vulnerability-detector>
+
+  </vulnerability-detector>
 </ossec_config>
 ```
 
@@ -1072,7 +1079,7 @@ In order to detect vulnerabilities on Linux endpoints, enable the collection of 
 
 A global vulnerability database, with the list of all `CVEs` check is created on the Wazuh manager at `/var/ossec/queue/vulnerabilities/cve.db`.
 
-Scans will be performed periodically, going through the list of applications collected for each monitored endpoint  and looking for known vulnerabilities. 
+Scans will be performed periodically, going through the list of applications collected for each monitored endpoint and looking for known vulnerabilities. 
 
 #### Alerts
 
@@ -1092,7 +1099,7 @@ Yara is a tool aimed at (but not limited to) helping malware researchers to iden
 
 Create local rules and decoders that will trigger on added/modified files in the `/tmp` directory, and also the rules that will check the results.
 
-- Rules at  `/var/ossec/etc/rules/local_rules.xml`:
+- Rules at `/var/ossec/etc/rules/local_rules.xml`:
 
 ```xml
 <group name="syscheck,">
@@ -1121,7 +1128,7 @@ Create local rules and decoders that will trigger on added/modified files in the
 </group>
 ```
 
-- Decoders at  `/var/ossec/etc/decoders/local_decoders.xml`:
+- Decoders at `/var/ossec/etc/decoders/local_decoders.xml`:
 
 ```xml
 <decoder name="yara_decoder">
@@ -1142,13 +1149,13 @@ Create local rules and decoders that will trigger on added/modified files in the
     <command>
         <name>yara</name>
         <executable>yara.sh</executable>
+        <extra_args>-yara_path /usr/local/bin -yara_rules /home/wazuh/yara/rules/yara_rules.yar</extra_args>
         <timeout_allowed>no</timeout_allowed>
     </command>
     <active-response>
         <command>yara</command>
         <location>local</location>
         <rules_id>100300,100301</rules_id>
-        <timeout>600</timeout>
     </active-response>
 </ossec_config>
 ```
@@ -1161,7 +1168,7 @@ systemctl restart wazuh-manager
 
 #### Configuration on the monitored Linux system
 
-- Compile and install yara
+- Compile and install Yara
 
 ```
 yum -y install make gcc autoconf libtool openssl-devel && \
@@ -1171,7 +1178,7 @@ cd yara-4.0.2 &&
 ./bootstrap.sh && ./configure && make && sudo make install && make check
 ```
 
-- Download yara rules
+- Download Yara rules
 
 ```
 cd /tmp/
@@ -1186,7 +1193,7 @@ curl 'https://valhalla.nextron-systems.com/api/v1/get' \
 -o yara_rules.yar
 ```
 
-- Download  a malware sample (this is a real malware artifact) and run a Yara scan
+- Download a malware sample (this is a real malware artifact) and run a Yara scan
 
 ```
 curl -LO https://wazuh-demo.s3-us-west-1.amazonaws.com/mirai -o /tmp/mirai
@@ -1198,7 +1205,7 @@ curl -LO https://wazuh-demo.s3-us-west-1.amazonaws.com/mirai -o /tmp/mirai
 ```bash
 #!/bin/bash
 # Wazuh - Yara active response
-# Copyright (C) 2015-2020, Wazuh Inc.
+# Copyright (C) 2015-2021, Wazuh Inc.
 #
 # This program is free software; you can redistribute it
 # and/or modify it under the terms of the GNU General Public
@@ -1258,7 +1265,7 @@ chmod 750 /var/ossec/active-response/bin/yara.sh
 chown root:ossec /var/ossec/active-response/bin/yara.sh
 ```
 
-- Change the file integrity monitoring settings to monitor `/tmp`  in real time. This change can be done in `/var/ossec/etc/ossec.conf` 
+- Change the file integrity monitoring settings to monitor `/tmp` in real time. This change can be done in `/var/ossec/etc/ossec.conf` 
 
 ```xml
   <syscheck>
@@ -1279,7 +1286,7 @@ systemctl restart wazuh-agent
 ```bash
 #!/bin/bash
 # Wazuh - Malware Downloader for test purposes
-# Copyright (C) 2015-2020, Wazuh Inc.
+# Copyright (C) 2015-2021, Wazuh Inc.
 #
 # This program is free software; you can redistribute it
 # and/or modify it under the terms of the GNU General Public
