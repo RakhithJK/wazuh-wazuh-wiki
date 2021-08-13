@@ -818,9 +818,10 @@ Please, check our [VirusTotal documentation](https://documentation.wazuh.com/cur
 #### Prerequisites
 
 - A VirusTotal API key (https://www.virustotal.com)
-- Python installed on the Wazuh manager (`yum -y install python2`)
+- Python installed in the Wazuh manager (`yum -y install python2`)
 - Custom rules and decoders in the Wazuh manager
 - Custom active response script in the monitored endpoint (Linux RHEL)
+- Install `jq` in the monitored endpoint to process the input JSON in the AR script (`yum -y install jq`)
 
 #### Configuring VirusTotal integration
 
@@ -1250,6 +1251,8 @@ fi
 exit 0;
 
 ```
+
+- Ensure `jq` is installed to process the JSON input in the `yara.sh` script
 
 - Change `/var/ossec/active-response/bin/yara.sh` file owner and permissions:
 
