@@ -918,26 +918,27 @@ Change the file integrity monitoring settings to monitor `/root`  in real-time. 
     <directories whodata="yes">/root</directories>
   </syscheck>
 ```
-- On the monitored endpoint (Linux RHEL running the Wazuh agent),  add the following active response script at `/var/ossec/active-response/bin/remove-threat.sh` . 
+- On the monitored endpoint (Linux RHEL running the Wazuh agent),  add the following active response script at `/var/ossec/active-response/bin/remove-threat.sh`. 
 
 ```bash
 #!/bin/bash
+# Wazuh - Remove threat active response
+# Copyright (C) 2015-2021, Wazuh Inc.
+#
+# This program is free software; you can redistribute it
+# and/or modify it under the terms of the GNU General Public
+# License (version 2) as published by the FSF - Free Software
+# Foundation.
 
-LOCAL=`dirname $0`;
-cd $LOCAL
-cd ../
-
-PWD=`pwd`
-
-INPUT_JSON=$(cat -)
+read INPUT_JSON
 FILENAME=$(echo $INPUT_JSON | jq -r .parameters.alert.data.virustotal.source.file)
 
 # Removing file
 rm -f $FILENAME 
 if [ $? -eq 0 ]; then
-    echo "`date` $0 Removed positive threat located in $FILENAME" >> ${PWD}/../logs/active-responses.log
+    echo "`date` $0 Removed positive threat located in $FILENAME" >> logs/active-responses.log
 else
-    echo "`date` $0 Error removing positive threat located in $FILENAME" >> ${PWD}/../logs/active-responses.log
+    echo "`date` $0 Error removing positive threat located in $FILENAME" >> logs/active-responses.log
 fi
 
 exit 0;
@@ -1215,22 +1216,14 @@ curl -LO https://wazuh-demo.s3-us-west-1.amazonaws.com/mirai -o /tmp/mirai
 
 #------------------------- Gather parameters -------------------------#
 
-# Static active response parameters
-LOCAL=`dirname $0`
-
 # Extra arguments
-INPUT_JSON=$(cat -)
+read INPUT_JSON
 YARA_PATH=$(echo $INPUT_JSON | jq -r .parameters.extra_args[1])
 YARA_RULES=$(echo $INPUT_JSON | jq -r .parameters.extra_args[3])
 FILENAME=$(echo $INPUT_JSON | jq -r .parameters.alert.syscheck.path)
 
-# Move to the active response folder
-cd $LOCAL
-cd ../
-
 # Set LOG_FILE path
-PWD=`pwd`
-LOG_FILE="${PWD}/../logs/active-responses.log"
+LOG_FILE="logs/active-responses.log"
 
 
 #----------------------- Analyze parameters -----------------------#
@@ -1238,7 +1231,7 @@ LOG_FILE="${PWD}/../logs/active-responses.log"
 if [[ ! $YARA_PATH ]] || [[ ! $YARA_RULES ]]
 then
     echo "wazuh-yara: ERROR - Yara active response error. Yara path and rules parameters are mandatory." >> ${LOG_FILE}
-    exit
+    exit 1
 fi
 
 #------------------------- Main workflow --------------------------#
@@ -1254,7 +1247,7 @@ then
     done <<< "$yara_output"
 fi
 
-exit 1;
+exit 0;
 
 ```
 
@@ -1265,7 +1258,7 @@ chmod 750 /var/ossec/active-response/bin/yara.sh
 chown root:ossec /var/ossec/active-response/bin/yara.sh
 ```
 
-- Change the file integrity monitoring settings to monitor `/tmp` in real time. This change can be done in `/var/ossec/etc/ossec.conf` 
+- Change the file integrity monitoring settings to monitor `/tmp` in real-time. This change can be done in `/var/ossec/etc/ossec.conf` 
 
 ```xml
   <syscheck>
@@ -1338,7 +1331,7 @@ fi
 bash /tmp/malware_downloader.sh
 ```
 
-- On the agent, the results of the yara scan can be seen at `/var/ossec/logs/active-responses.log`
+- On the agent, the results of the Yara scan can be seen at `/var/ossec/logs/active-responses.log`
 
 ```bash
 tail -f /var/ossec/logs/active-responses.log
