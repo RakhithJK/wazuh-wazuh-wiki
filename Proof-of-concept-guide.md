@@ -58,7 +58,7 @@ RHEL also has good documentation about Audit kernel subsystem, check  [RHEL Audi
 
 #### Configuration
 
-- Install audit
+- Check that the Linux Auditing System (`auditd`) is installed and running in your system.
 
 - In order to monitor your user actions, get your current EUID ('root' user monitoring is not recommended for the test, as it can be quite noisy).
 
