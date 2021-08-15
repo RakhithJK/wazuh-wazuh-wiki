@@ -66,7 +66,7 @@ RHEL also has good documentation about Audit kernel subsystem, check  [RHEL Audi
 echo $EUID
 ```
 
-- Configure `/etc/audit/rules.d/audit.rules`:
+- Create the rules for your user at `/etc/audit/rules.d/wazuh.rules`. Make sure you include your user `euid`:
 
 ```
 -a exit,always -F euid=${replace_by_your_user_euid} -F arch=b32 -S execve -k audit-wazuh-c
@@ -82,7 +82,7 @@ auditctl -D
 - Update rules
 
 ```
-auditctl -R /etc/audit/rules.d/audit.rules
+auditctl -R /etc/audit/rules.d/wazuh.rules
 ```
 
 #### Steps to generate the alerts
