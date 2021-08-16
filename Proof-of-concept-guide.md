@@ -159,6 +159,12 @@ Wazuh module for AWS (aws-s3) enables log data gathering from different AWS sour
 </wodle>
 ```
 
+- Restart Wazuh manager to apply changes:
+
+```
+service wazuh-manager restart
+```
+
 #### Steps to generate the alerts
 
 - Alerts are automatically generated from AWS logs (when using out-of-the-box rules). They will appear as soon as they are fetched from the AWS S3 bucket.
