@@ -60,6 +60,15 @@ RHEL also has good documentation about Audit kernel subsystem, check  [RHEL Audi
 
 - Check that the Linux Auditing System (`auditd`) is installed and running in your system.
 
+- Check that your Wazuh agent is configured to read `audit.log` file. This configuration is included by default.
+
+```
+  <localfile>
+    <log_format>audit</log_format>
+    <location>/var/log/audit/audit.log</location>
+  </localfile>
+```
+
 - In order to monitor your user actions, get your current EUID ('root' user monitoring is not recommended for the test, as it can be quite noisy).
 
 ```
