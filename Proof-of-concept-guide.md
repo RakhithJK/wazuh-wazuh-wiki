@@ -129,28 +129,28 @@ Wazuh module for AWS (aws-s3) enables log data gathering from different AWS sour
       <name>wazuh-cloudtrail</name>
       <access_key>${replace_by_your_AwsAccessKey}</access_key>
       <secret_key>${replace_by_your_AwsSecretKey}</secret_key>
-      <only_logs_after>2020-MAR-24</only_logs_after>
+      <only_logs_after>2021-AUG-01</only_logs_after>
     </bucket>
     <bucket type="guardduty">
       <name>wazuh-aws-wodle</name>
       <path>guardduty</path>
       <access_key>${replace_by_your_AwsAccessKey}</access_key>
       <secret_key>${replace_by_your_AwsSecretKey}</secret_key>
-      <only_logs_after>2020-MAR-24</only_logs_after>
+      <only_logs_after>2021-AUG-01</only_logs_after>
     </bucket>
     <bucket type="custom">
       <name>wazuh-aws-wodle</name>
       <path>macie</path>
       <access_key>${replace_by_your_AwsAccessKey}</access_key>
       <secret_key>${replace_by_your_AwsSecretKey}</secret_key>
-      <only_logs_after>2020-MAR-24</only_logs_after>
+      <only_logs_after>2021-AUG-01</only_logs_after>
     </bucket>
     <bucket type="vpcflow">
       <name>wazuh-aws-wodle</name>
       <path>vpc</path>
       <access_key>${replace_by_your_AwsAccessKey}</access_key>
       <secret_key>${replace_by_your_AwsSecretKey}</secret_key>
-      <only_logs_after>2020-MAR-24</only_logs_after>
+      <only_logs_after>2021-AUG-01</only_logs_after>
     </bucket>
     <service type="inspector">
       <access_key>${replace_by_your_AwsAccessKey}</access_key>
