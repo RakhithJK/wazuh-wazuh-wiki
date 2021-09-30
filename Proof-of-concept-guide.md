@@ -891,11 +891,17 @@ Additionally, once VirusTotal detects a file as a threat (positive match with an
 
 ```xml
 <group name="virustotal,">
-    <rule id="100092" level="12">
-    <if_sid>607</if_sid>
-    <match>Removed threat located at</match>
-    <description>$(script_name) Removed threat located at $(path)</description>
-    </rule>
+  <rule id="100092" level="12">
+    <if_sid>657</if_sid>
+    <match>Successfully removed threat</match>
+    <description>$(parameters.program) removed threat located at $(parameters.alert.data.virustotal.source.file)</description>
+  </rule>
+
+  <rule id="100093" level="12">
+    <if_sid>657</if_sid>
+    <match>Error removing threat</match>
+    <description>Error removing threat located at $(parameters.alert.data.virustotal.source.file)</description>
+  </rule>
 </group>
 ```
 
@@ -938,23 +944,39 @@ Change the file integrity monitoring settings to monitor `/root`  in real-time. 
 
 ```bash
 #!/bin/bash
-# Wazuh - Remove threat active response
-# Copyright (C) 2015-2021, Wazuh Inc.
-#
-# This program is free software; you can redistribute it
-# and/or modify it under the terms of the GNU General Public
-# License (version 2) as published by the FSF - Free Software
-# Foundation.
+
+LOCAL=`dirname $0`;
+cd $LOCAL
+cd ../
+
+PWD=`pwd`
 
 read INPUT_JSON
 FILENAME=$(echo $INPUT_JSON | jq -r .parameters.alert.data.virustotal.source.file)
+COMMAND=$(echo $INPUT_JSON | jq -r .command)
+LOG_FILE="${PWD}/../logs/active-responses.log"
+
+#------------------------ Analyze command -------------------------#
+if [ ${COMMAND} = "add" ]
+then
+ # Send control message to execd
+ printf '{"version":1,"origin":{"name":"remove-threat","module":"active-response"},"command":"check_keys", "parameters":{"keys":[]}}\n'
+
+ read RESPONSE
+ COMMAND2=$(echo $RESPONSE | jq -r .command)
+ if [ ${COMMAND2} != "continue" ]
+ then
+   echo "`date '+%Y/%m/%d %H:%M:%S'` $0: $INPUT_JSON Remove threat active response aborted" >> ${LOG_FILE}
+   exit 0;
+ fi
+fi
 
 # Removing file
-rm -f $FILENAME 
+rm -f $FILENAME
 if [ $? -eq 0 ]; then
-    echo "`date` $0 Removed positive threat located in $FILENAME" >> logs/active-responses.log
+ echo "`date '+%Y/%m/%d %H:%M:%S'` $0: $INPUT_JSON Successfully removed threat" >> ${LOG_FILE}
 else
-    echo "`date` $0 Error removing positive threat located in $FILENAME" >> logs/active-responses.log
+ echo "`date '+%Y/%m/%d %H:%M:%S'` $0: $INPUT_JSON Error removing threat" >> ${LOG_FILE}
 fi
 
 exit 0;
