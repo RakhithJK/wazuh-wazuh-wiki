@@ -43,7 +43,7 @@ The following document explains how to set up the Wazuh environment to test the 
 
 - Elasticsearch + Kibana + Wazuh Kibana plugin
 - Wazuh manager + Filebeat (for integration with Elasticsearch)
-- Wazuh agent (RHEL 7)
+- Wazuh agent (Centos 8)
 - Wazuh agent (Windows)
 
 A good guide on how to install these components can be found at [our installation guide](https://documentation.wazuh.com/current/installation-guide/index.html).
@@ -52,9 +52,9 @@ The sections below explain the required configurations to set up different use c
 
 ## <a name="audit"></a>Auditing commands run by user
 
-On the Linux monitored endpoint (RHEL), configure Audit logging to capture execve system calls (necessary to audit commands run by users). More info on [Audit Configuration Guide](https://documentation.wazuh.com/current/learning-wazuh/audit-commands.html).
+On the Linux monitored endpoint (CentOS), configure Audit logging to capture execve system calls (necessary to audit commands run by users). More info on [Audit Configuration Guide](https://documentation.wazuh.com/current/learning-wazuh/audit-commands.html).
 
-RHEL also has good documentation about Audit kernel subsystem, check  [RHEL Audit documentation](https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux/6/html/security_guide/chap-system_auditing) for more information about this.
+CentOS also has good documentation about Audit kernel subsystem, check  [CentOS Audit documentation](https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux/8/html/security_hardening/auditing-the-system_security-hardening) for more information about this.
 
 #### Configuration
 
@@ -96,8 +96,8 @@ auditctl -R /etc/audit/rules.d/wazuh.rules
 
 #### Steps to generate the alerts
 
-- Log in the RHEL Agent as the monitored user
-- Execute a ping to `www.google.com`
+- Log in to the CentOS Agent server as the monitored user.
+- Execute a ping to `www.google.com`.
 
 #### Alerts
 
@@ -107,7 +107,7 @@ Related alerts can be found with:
 
 #### Affected endpoint
 
-- RHEL 7 Agent
+- CentOS 8 Agent
 
 
 ## <a name="aws"></a>Amazon AWS infrastructure monitoring
@@ -217,7 +217,7 @@ hydra -l Administrator -p wrong_password <win-agent-endpoint> rdp
 
 #### Affected endpoints
 
-- Linux RHEL
+- Linux CentOS
 - Windows
 
 
@@ -244,6 +244,9 @@ Check [Docker Wodle](https://documentation.wazuh.com/4.0/docker-monitor/monitori
 </ossec_config>
 ```
 
+- Restart the Wazuh Agent service
+`systemctl restart wazuh-agent`
+
 #### Steps to generate the alerts
 
 - Perform any usual Docker action like pulling an image, starting a container, running a command or deleting the container.
@@ -252,8 +255,8 @@ Check [Docker Wodle](https://documentation.wazuh.com/4.0/docker-monitor/monitori
 docker stop `docker ps -a -q` && docker rm `docker ps -a -q`
 docker pull nginx
 docker run -d -P --name nginx_container nginx
-docker exec -ti nginx_container cat /etc/passwd
-docker exec -ti nginx_container /bin/bash
+docker exec nginx_container cat /etc/passwd
+docker exec nginx_container /bin/bash
 docker stop nginx_container
 docker rm nginx_container
 ```
@@ -267,7 +270,7 @@ Related alerts can be found with:
 
 #### Affected endpoint
 
-- Linux RHEL
+- Linux CentOS
 
 ## <a name="fim"></a>File integrity monitoring
 
@@ -290,6 +293,8 @@ Related alerts can be found with:
 <directories check_all="yes" report_changes="yes" whodata="yes">C:\\Wazuh</directories>
 ```
 
+- Restart the Wazuh Agent services
+ 
 #### Steps to generate the alerts
 
 - Create, remove, or modify a file in the monitored directories.
@@ -302,7 +307,7 @@ Related alerts can be found with:
 
 #### Affected endpoints
 
-- Linux RHEL
+- Linux CentOS
 - Windows
 
 
@@ -363,12 +368,6 @@ chown ossec:ossec /var/ossec/etc/lists/blacklist-alienvault
 chmod 660 /var/ossec/etc/lists/blacklist-alienvault
 ```
 
-- Execute ossec binary to generate `.cdb` file
-
-```
-/var/ossec/bin/ossec-makelists
-```
-
 - Add a custom rule to trigger the active response. This can be done at `/var/ossec/etc/rules/local_rules.xml`
 
 ```xml
@@ -414,7 +413,7 @@ chmod 660 /var/ossec/etc/lists/blacklist-alienvault
 
 - Restart the Wazuh Manager
 ```
-/var/ossec/bin/ossec-control restart
+/var/ossec/bin/wazuh-control restart
 ```
 
 #### Steps to generate the alerts
@@ -430,7 +429,7 @@ Related alerts can be found with:
 
 #### Affected endpoint
 
-- Linux RHEL
+- Linux CentOS
 
 
 ## <a name="netcat"></a>Detecting unauthorized processes - Netcat
@@ -439,7 +438,7 @@ Wazuh is capable of detecting if Netcat is running on a monitored host.
 
 #### Configuration
 
-On the monitored endpoint (Linux RHEL):
+On the monitored endpoint (Linux CentOS):
 
 - Add `<localfile>` configuration block to periodically get a list of running processes. This can be done in the `ossec.conf` file.
 
@@ -489,15 +488,15 @@ On Wazuh Manager:
 
 #### Steps to Generate alerts
 
-- Log in to the RHEL system and run `nc -l -p 8000` (keep it running for 30 seconds)
+- Log in to the CentOS system and run `nc -l -p 8000` (keep it running for 30 seconds)
 
 #### Alerts
 
-- ```rule.id:(601 OR 100100)```
+- ```rule.id:(533 OR 100051)```
 
 #### Affected endpoint
 
-- Linux RHEL
+- Linux CentOS
 
 
 ## <a name="osquery"></a>Osquery integration
