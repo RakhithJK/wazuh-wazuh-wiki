@@ -505,12 +505,12 @@ Wazuh agent can be integrated with Osquery, making it easy to capture additional
 
 #### Configuration
 
-On the monitored endpoint (RHEL Linux):
+On the monitored endpoint (Linux CentOS):
 
 - Install Osquery
 
 ```
-yum install -y https://pkg.osquery.io/rpm/osquery-4.5.1-1.linux.x86_64.rpm
+yum install -y https://pkg.osquery.io/rpm/osquery-5.0.1-1.linux.x86_64.rpm
 ```
 
 - Set the content of the Osquery configuration file  `/etc/osquery/osquery.conf` to:
@@ -576,31 +576,36 @@ systemctl restart wazuh-agent
 
 - Wazuh automatically reads the `/var/log/osquery/osqueryd.results.log` and generates alerts based on the obtained information
 
+#### Alerts
+
+- ```rule.groups: "osquery"```
+
 #### Affected endpoint
 
-- Linux RHEL
+- Linux CentOS
 
 
 ## <a name="suricata"></a>Network IDS integration - Suricata
 
-Suricata is a NIDS solution that can detect threats by monitoring the network traffic. An example use case can be found at the following document: [Catch suspicious network traffic](https://documentation.wazuh.com/4.0/learning-wazuh/suricata.html).
+Suricata is a NIDS solution that can detect threats by monitoring the network traffic. An example use case can be found at the following document: [Catch suspicious network traffic](https://documentation.wazuh.com/4.2/learning-wazuh/suricata.html).
 
 ### Configuration
 
-On Linux RHEL monitored endpoint:
+On Linux CentOS monitored endpoint:
 
-- Install Suricata (tested with version 5.0.4). It requires EPEL repository (be aware that this repository depends on your operating system version):
+- Install Suricata (tested with version 6.0.3). It requires EPEL repository (be aware that this repository depends on your operating system version):
 
 ```
-yum install https://dl.fedoraproject.org/pub/epel/epel-release-latest-8.noarch.rpm
-yum -y install suricata-5.0.4
+yum install epel-release yum-plugin-copr
+yum copr enable @oisf/suricata-6.0
+yum install suricata
 ```
 
 - Download and extract Emerging rules:
 
 ```
 cd /tmp/
-curl -LO https://rules.emergingthreats.net/open/suricata-5.0.4/emerging.rules.tar.gz
+curl -LO https://rules.emergingthreats.net/open/suricata-6.0.3/emerging.rules.tar.gz
 tar -xvzf emerging.rules.tar.gz && mv rules/*.rules /etc/suricata/rules/
 chown suricata:suricata /etc/suricata/rules/*.rules
 chmod 640 /etc/suricata/rules/*.rules
