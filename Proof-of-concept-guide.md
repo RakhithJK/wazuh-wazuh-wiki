@@ -613,14 +613,12 @@ chmod 640 /etc/suricata/rules/*.rules
 
 - Modify Suricata settings at  `/etc/suricata/suricata.yaml`
 
-```yaml
-EXTERNAL_NET: "any"
-```
-
-```yaml
-default-rule-path: /etc/suricata/rules
-rule-files:
-  - "*.rules"
+```bash
+cd /etc/suricata/
+mv suricata.yml suricata.yml.bak
+curl -OL http://www.branchnetconsulting.com/wazuh/suricata.yaml
+sed -i '/rule-files:/,/#only use the scada_special if you have the scada extensions compiled int/{//!d}' suricata.yaml
+sed -i '/rule-files/ a \  - "*.rules"' suricata.yaml
 ```
 
 - Start Suricata
@@ -656,7 +654,7 @@ systemctl restart wazuh-agent
 
 #### Affected endpoint
 
-- Linux RHEL
+- Linux CentOS
 
 
 ## <a name="shellshock"></a>Detecting a web attack - Shellshock
