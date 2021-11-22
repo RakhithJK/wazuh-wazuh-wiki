@@ -800,20 +800,17 @@ Wazuh can detect trojaned system binaries by using signatures in `/var/ossec/etc
 
 #### Steps to generate the alerts
 
-- Create a copy of the trojaned file
-
-```
-cp -p /usr/bin/w /usr/bin/w.copy
-```
-
-- Then modify the original system binary so it runs a shell script instead. In this case we modify  `/usr/bin/w`:
+- As the root user modify the original system binary so it runs a shell script instead. In this case we modify  `/usr/bin/w`:
 
 ```bash
+cp /usr/bin/w /usr/bin/w.bck
+cat << EOF > /usr/bin/w
 #!/bin/bash
-echo "`date` this is evil"   > /tmp/trojan_created_file
-echo 'test for /usr/bin/w trojaned file' >> /tmp/trojan_created_file
-#Now running original binary
-/usr/bin/w.copy
+echo `date` this is evil
+echo demo from /usr/bin/w
+EOF
+chmod +x /usr/bin/w
+/usr/bin/w
 ```
 
 #### Alerts
