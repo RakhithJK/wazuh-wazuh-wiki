@@ -1012,7 +1012,7 @@ ls -lah eicar.com
 
 #### Affected endpoints
 
-- Linux RHEL
+- Linux CentOS
 
 
 ## <a name="vulnerability_detector"></a>Vulnerability detection
@@ -1125,7 +1125,7 @@ Scans will be performed periodically, going through the list of applications col
 
 #### Affected endpoints
 
-- Linux RHEL
+- Linux CentOS
 - Windows
 
 
@@ -1187,7 +1187,7 @@ Create local rules and decoders that will trigger on added/modified files in the
     <command>
         <name>yara</name>
         <executable>yara.sh</executable>
-        <extra_args>-yara_path /usr/local/bin -yara_rules /home/wazuh/yara/rules/yara_rules.yar</extra_args>
+        <extra_args>-yara_path /usr/local/bin -yara_rules /tmp/yara_rules.yar</extra_args>
         <timeout_allowed>no</timeout_allowed>
     </command>
     <active-response>
@@ -1210,9 +1210,9 @@ systemctl restart wazuh-manager
 
 ```
 yum -y install make gcc autoconf libtool openssl-devel && \
-curl -LO https://github.com/VirusTotal/yara/archive/v4.0.2.tar.gz && \
-tar -xvzf v4.0.2.tar.gz && \
-cd yara-4.0.2 &&
+curl -LO https://github.com/VirusTotal/yara/archive/v4.1.3.tar.gz && \
+tar -xvzf v4.1.3.tar.gz && \
+cd yara-4.1.3 &&
 ./bootstrap.sh && ./configure && make && sudo make install && make check
 ```
 
