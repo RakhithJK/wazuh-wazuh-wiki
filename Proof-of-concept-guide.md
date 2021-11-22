@@ -201,7 +201,7 @@ Run multiple failed authentication failure attempts against the monitored endpoi
 - Linux example :
 
 ```
-for i in `seq 1 10`; do sshpass -p 'wrong_password' ssh -o StrictHostKeyChecking=no <rhel-agent-endpoint>; done
+for i in `seq 1 10`; do sshpass -p 'wrong_password' ssh -o StrictHostKeyChecking=no <centos-agent-endpoint>; done
 ```
 
 - Windows example:
@@ -231,7 +231,7 @@ Check [Docker Wodle](https://documentation.wazuh.com/4.0/docker-monitor/monitori
 
 - On the monitored system (the Docker host), install required Wazuh module dependency `pip install docker`
 
-- Configure the Docker listener in the RHEL Agent
+- Configure the Docker listener in the CentOS Agent
 
 ```xml
 <ossec_config>
@@ -276,7 +276,7 @@ Related alerts can be found with:
 
 #### Configuration
 
-- Enable whodata on the monitored endpoint (RHEL and Windows) ossec.conf file. Optionally, this can also be done through centralized configuration groups:
+- Enable whodata on the monitored endpoint (CentOS and Windows) ossec.conf file. Optionally, this can also be done through centralized configuration groups:
 
 ```xml
 <directories check_all="yes" whodata="yes">/usr/bin,/usr/sbin</directories>
@@ -315,7 +315,7 @@ Related alerts can be found with:
 
 #### Prerequesites
 
-- Apache server running on the monitored system (Linux RHEL)
+- Apache server running on the monitored system (Linux CentOS)
 
 - Wazuh agent configured to monitor the Apache access logs:
 
@@ -418,7 +418,7 @@ chmod 660 /var/ossec/etc/lists/blacklist-alienvault
 
 #### Steps to generate the alerts
 
-- Log in the attacker system (the Windows box) and connect to the victim (Linux RHEL) Apache server from a web browser.
+- Log in the attacker system (the Windows box) and connect to the victim (Linux CentOS) Apache server from a web browser.
 - A Linux firewall rule will temporarily block any connection from the attacker system for 60 seconds (using IPtables).
 
 #### Alerts
@@ -665,7 +665,7 @@ In addition, for further detection, the attack can also be detected at a network
 
 #### Prerequesites
 
-- Apache server running on the monitored system (Linux RHEL)
+- Apache server running on the monitored system (Linux CentOS)
 
 - Wazuh agent configured to monitor the Apache access logs:
 
@@ -697,7 +697,7 @@ curl -H "User-Agent: () { :; }; /bin/cat /etc/passwd" ${replace_by_your_web_serv
 
 #### Affected endpoint
 
-- Linux RHEL
+- Linux CentOS
 
 ## <a name="sql_injection"></a>Detecting a web attack - SQL Injection
 
@@ -705,7 +705,7 @@ This use case aims to show that Wazuh is able to detect a SQL Injection attack (
 
 #### Prerequesites
 
-- Apache server running on the monitored system (Linux RHEL)
+- Apache server running on the monitored system (Linux CentOS)
 
 - Wazuh agent configured to monitor the Apache access logs:
 
@@ -737,7 +737,7 @@ curl -XGET "http://${replace_by_your_web_server_address}/?id=SELECT+*+FROM+users
 
 #### Affected endpoint
 
-- Linux RHEL
+- Linux CentOS
 
 ## <a name="slack"></a>Slack integration
 
@@ -821,7 +821,7 @@ Wait for the next rootcheck scan to be completed (frequency can be adjusted), an
 
 #### Affected endpoints
 
-- Linux RHEL
+- Linux CentOS
 
 ## <a name="virustotal"></a>Detecting and removing malware - VirusTotal integration
 
@@ -834,7 +834,7 @@ Please, check our [VirusTotal documentation](https://documentation.wazuh.com/cur
 - A VirusTotal API key (https://www.virustotal.com)
 - Python installed in the Wazuh manager (`yum -y install python2`)
 - Custom rules and decoders in the Wazuh manager
-- Custom active response script in the monitored endpoint (Linux RHEL)
+- Custom active response script in the monitored endpoint (Linux CentOS)
 - Install `jq` in the monitored endpoint to process the input JSON in the AR script (`yum -y install jq`)
 
 #### Configuring VirusTotal integration
@@ -939,7 +939,7 @@ Change the file integrity monitoring settings to monitor `/root`  in real-time. 
     <directories whodata="yes">/root</directories>
   </syscheck>
 ```
-- On the monitored endpoint (Linux RHEL running the Wazuh agent),  add the following active response script at `/var/ossec/active-response/bin/remove-threat.sh`. 
+- On the monitored endpoint (Linux CentOS running the Wazuh agent),  add the following active response script at `/var/ossec/active-response/bin/remove-threat.sh`. 
 
 ```bash
 #!/bin/bash
@@ -1388,4 +1388,4 @@ wazuh-yara: INFO - Scan result: Webshell_Worse_Linux_Shell_1_RID320C /tmp/webshe
 
 #### Affected endpoints
 
-- Linux RHEL
+- Linux CentOS
