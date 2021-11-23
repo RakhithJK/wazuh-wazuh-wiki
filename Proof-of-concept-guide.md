@@ -60,7 +60,7 @@ CentOS also has good documentation about Audit kernel subsystem, check  [CentOS 
 
 - Check that the Linux Auditing System (`auditd`) is installed and running in your system.
 
-- Check that your Wazuh agent is configured to read `audit.log` file. This configuration is included by default.
+- Check that your Wazuh agent is configured to read `audit.log` file. This configuration is included by default in `/var/ossec/etc/ossec.conf`.
 
 ```
   <localfile>
@@ -201,7 +201,7 @@ Run multiple failed authentication failure attempts against the monitored endpoi
 - Linux example :
 
 ```
-for i in `seq 1 10`; do sshpass -p 'wrong_password' ssh -o StrictHostKeyChecking=no <centos-agent-endpoint>; done
+for i in `seq 1 10`; do sshpass -p 'wrong_password' ssh -o StrictHostKeyChecking=no blimey@<centos-agent-endpoint>; done
 ```
 
 - Windows example:
@@ -229,18 +229,18 @@ Check [Docker Wodle](https://documentation.wazuh.com/4.0/docker-monitor/monitori
 
 #### Configuration
 
-- On the monitored system (the Docker host), install required Wazuh module dependency `pip install docker`
-
-- Configure the Docker listener in the CentOS Agent
+- On the monitored system (the Docker host), install required Wazuh module dependency `pip install docker`.
+- On the monitored system (the Docker host), `python` executable must be available.
+- Configure the Docker listener in the CentOS Agent. Enable the `docker-listener` wodle in the `/var/ossec/etc/ossec.conf`.
 
 ```xml
 <ossec_config>
-    <wodle name="docker-listener">
+  <wodle name="docker-listener">
     <interval>10m</interval>
     <attempts>5</attempts>
     <run_on_start>yes</run_on_start>
     <disabled>no</disabled>
-    </wodle>
+  </wodle>
 </ossec_config>
 ```
 
@@ -276,7 +276,7 @@ Related alerts can be found with:
 
 #### Configuration
 
-- Enable whodata on the monitored endpoint (CentOS and Windows) ossec.conf file. Optionally, this can also be done through centralized configuration groups:
+- Enable `whodata` on the monitored endpoint (CentOS and Windows) ossec.conf file. Optionally, this can also be done through centralized configuration groups:
 
 ```xml
 <directories check_all="yes" whodata="yes">/usr/bin,/usr/sbin</directories>
@@ -486,6 +486,12 @@ On Wazuh Manager:
 </group>
 ```
 
+- Restart Wazuh manager to apply configuration changes
+
+```
+systemctl restart wazuh-manager
+```
+
 #### Steps to Generate alerts
 
 - Log in to the CentOS system and run `nc -l -p 8000` (keep it running for 30 seconds)
@@ -541,14 +547,20 @@ yum install -y https://pkg.osquery.io/rpm/osquery-5.0.1-1.linux.x86_64.rpm
 },
 
 "packs": {
-    "osquery-monitoring": "/usr/share/osquery/packs/osquery-monitoring.conf",
-    "incident-response": "/usr/share/osquery/packs/incident-response.conf",
-    "it-compliance": "/usr/share/osquery/packs/it-compliance.conf",
-    "vuln-management": "/usr/share/osquery/packs/vuln-management.conf",
-    "hardware-monitoring": "/usr/share/osquery/packs/hardware-monitoring.conf",
-    "ossec-rootkit": "/usr/share/osquery/packs/ossec-rootkit.conf"
+    "osquery-monitoring": "/opt/osquery/share/osquery/packs/osquery-monitoring.conf",
+    "incident-response": "/opt/osquery/share/osquery/packs/incident-response.conf",
+    "it-compliance": "/opt/osquery/share/osquery/packs/it-compliance.conf",
+    "vuln-management": "/opt/osquery/share/osquery/packs/vuln-management.conf",
+    "hardware-monitoring": "/opt/osquery/share/osquery/packs/hardware-monitoring.conf",
+    "ossec-rootkit": "/opt/osquery/share/osquery/packs/ossec-rootkit.conf"
     }
 }
+```
+
+- Start Osquery
+
+```
+service osqueryd start
 ```
 
 - Edit `/var/ossec/etc/ossec.conf` to enable the Osquery wodle. The Wazuh module will take care of running Osquery when needed (no need to start Osqueryd):
@@ -574,7 +586,7 @@ systemctl restart wazuh-agent
 
 #### Steps to generate the alerts
 
-- Wazuh automatically reads the `/var/log/osquery/osqueryd.results.log` and generates alerts based on the obtained information
+- Wazuh automatically reads the `/var/log/osquery/osqueryd.results.log` and generates alerts based on the obtained information.
 
 #### Alerts
 
@@ -615,10 +627,8 @@ chmod 640 /etc/suricata/rules/*.rules
 
 ```bash
 cd /etc/suricata/
-mv suricata.yml suricata.yml.bak
+mv suricata.yaml suricata.yaml.bak
 curl -OL http://www.branchnetconsulting.com/wazuh/suricata.yaml
-sed -i '/rule-files:/,/#only use the scada_special if you have the scada extensions compiled int/{//!d}' suricata.yaml
-sed -i '/rule-files/ a \  - "*.rules"' suricata.yaml
 ```
 
 - Start Suricata
@@ -661,8 +671,6 @@ systemctl restart wazuh-agent
 
 This example shows how Wazuh can detect a Shellshock attack by analyzing web server logs collected from a monitored endpoint. Please check [Wazuh Shellshock Attack documentation](https://documentation.wazuh.com/current/learning-wazuh/shellshock.html)
 
-In addition, for further detection, the attack can also be detected at a network level when Suricata integration is configured.
-
 #### Prerequesites
 
 - Apache server running on the monitored system (Linux CentOS)
@@ -678,6 +686,12 @@ In addition, for further detection, the attack can also be detected at a network
 
 - Suricata use case configured and monitoring the endpoint traffic (to make it easy, for the test, Suricata can run in the monitored system)
 
+- Restart the Wazuh agent, on the monitored endpoint, to apply configuration changes
+
+```
+systemctl restart wazuh-agent
+```
+
 #### Configuration
 
 This use case requires no additional configuration.
@@ -692,8 +706,7 @@ curl -H "User-Agent: () { :; }; /bin/cat /etc/passwd" ${replace_by_your_web_serv
 
 #### Alerts
 
-- For alert based on web server log analysis: ```rule.description:*shellshock*```
-- For alert based on network traffic analysis (Suricata NIDS): ```rule.description:*CVE-2014-6271*```
+- For alert based on web server log analysis: ```rule.description:*Shellshock*```
 
 #### Affected endpoint
 
@@ -716,8 +729,6 @@ This use case aims to show that Wazuh is able to detect a SQL Injection attack (
     </localfile>
 ```
 
-- Suricata use case configured and monitoring the endpoint traffic (to make it easy, for the test, Suricata can run in the monitored system)
-
 #### Configuration
 
 This use case requires no additional configuration.
@@ -733,7 +744,6 @@ curl -XGET "http://${replace_by_your_web_server_address}/?id=SELECT+*+FROM+users
 ####  Alerts
 
 - For alert based on web server log analysis: ```rule.id:31103```
-- For alert based on network traffic analysis (Suricata NIDS): ```data.alert.signature_id:2006445```
 
 #### Affected endpoint
 
@@ -758,6 +768,12 @@ On Wazuh manager:
     <level>10</level>
     <alert_format>json</alert_format>
 </integration>
+```
+
+- Restart Wazuh manager to apply configuration changes
+
+```
+systemctl restart wazuh-manager
 ```
 
 #### Alerts
