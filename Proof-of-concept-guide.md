@@ -707,6 +707,7 @@ curl -H "User-Agent: () { :; }; /bin/cat /etc/passwd" ${replace_by_your_web_serv
 #### Alerts
 
 - For alert based on web server log analysis: ```rule.description:*Shellshock*```
+- For alert based on network traffic analysis (Suricata NIDS): ```*suricata* AND rule.description: "Suricata: Alert - GPL WEB_SERVER 403 Forbidden"```
 
 #### Affected endpoint
 
@@ -744,6 +745,7 @@ curl -XGET "http://${replace_by_your_web_server_address}/?id=SELECT+*+FROM+users
 ####  Alerts
 
 - For alert based on web server log analysis: ```rule.id:31103```
+- For alert based on network traffic analysis (Suricata NIDS): ```*suricata* AND rule.description: "Suricata: Alert - ET WEB_SERVER Possible SQL Injection Attempt SELECT FROM"```
 
 #### Affected endpoint
 
