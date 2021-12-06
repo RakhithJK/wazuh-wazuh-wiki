@@ -1167,7 +1167,7 @@ Create local rules and decoders that will trigger on added/modified files in the
     <rule id="100301" level="7">
         <if_sid>554</if_sid>
         <field name="file">/tmp</field>
-        <description>File added to /tmpdirectory.</description>
+        <description>File added to /tmp directory.</description>
     </rule>
 </group>
 
