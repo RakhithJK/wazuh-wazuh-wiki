@@ -33,7 +33,7 @@
 
 ### Files and folders
 * Use lower case for new folders being created.
-* Use PascalCase for new files being created.
+* Use camelCase for new files being created.
 * Use descriptive related prefix for new files, e.g.: `osQueryManager.h`
 
 ## Style conventions
