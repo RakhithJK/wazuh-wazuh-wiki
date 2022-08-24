@@ -43,7 +43,7 @@
 * Use curly braces for initialization, e.g. `int result{ EXIT_SUCCESS };` rather than `int result = EXIT_SUCCESS;` .
 * Use empty curly braces to zero-initialize C-style structs and simple data types, e.g. `size_t bufferLength{};` rather than `size_t bufferLength{ 0 };`.
 * Use using instead of typedef.
-* Lines must not be longer than 80-90 characters, so break out function declarations over multiple lines.
+* Lines must not be longer than 120 characters, so break out function declarations over multiple lines.
 * Use alignment of parameter names, field names, assignment operators, etc. to improve legibility.
 * In header files, preferred use of:
 ```
