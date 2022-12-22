@@ -102,6 +102,7 @@ typedef struct {
 * See also: [C operator precedence](https://en.cppreference.com/w/c/language/operator_precedence).
 * Functions should limit themselves to a single page of code due to the fact that each method represents a technique for achieving a single objective.
 * Avoid using magic numbers. Declare and use a well descriptive macro or constant name instead.
+* Lines must not be longer than 120 characters, so break out function declarations over multiple lines.
 
 ## Initialization
 * Always initialize variables. gcc with the flag `-W` may catch operations on uninitialized variables, but it may also not.
