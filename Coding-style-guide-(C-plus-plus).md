@@ -123,4 +123,5 @@ const std::unique_ptr<T, smartDeleter> spSomething{ };
 * Reserve the size of `std::vector` if you know it in advance.
 * When using for-each to iterate over a container, declare the element type as `auto&` or `const auto&` as appropriate.
 * In scenarios where a container must be locked to ensure safe read access but will not be modified, use `std::shared_mutex` (with `std::shared_lock`) instead of `std::mutex`.
+* Avoid 'find' called with a string literal consisting of a single character. Use the more effective overload accepting a character ex find('a')
 
