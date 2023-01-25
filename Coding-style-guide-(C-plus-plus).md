@@ -111,7 +111,7 @@ const std::unique_ptr<T, smartDeleter> spSomething{ };
    Should be replaced by:
 
   `const auto insertSql{ R"{"table":"processes" ... "}]}"};`
-
+* Use emplace_back instead of push_back whenever possible.
 ## Exceptions and errors
 * Throw exceptions for any failure that is not ignorable.
 * Functions must only use a result code to denote ignorable failures, e.g. a hypothetical `deleteFile()` function might return false to indicate that a file doesn't exist but would throw an exception if deletion fails for some other reason.
